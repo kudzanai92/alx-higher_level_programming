@@ -7,14 +7,17 @@ void print_python_list(PyObject *p) {
         return;
     }
 
-    Py_ssize_t size = PyList_Size(p);
+    Py_ssize_t size = PyObject_Length(p);
 
     printf("[*] Python list info\n");
     printf("[*] Size of the Python List = %ld\n", size);
 
-    printf("[*] Allocated = %ld\n", ((PyListObject *)p)->allocated);
+    PyObject *allocated = PyObject_GetAttrString(p, "allocated");
+    printf("[*] Allocated = %ld\n", PyLong_AsLong(allocated));
+    Py_DECREF(allocated);
+
     for (Py_ssize_t i = 0; i < size; ++i) {
-        PyObject *item = PyList_GET_ITEM(p, i);
+        PyObject *item = PyList_GetItem(p, i);
         printf("Element %ld: %s\n", i, Py_TYPE(item)->tp_name);
     }
 }
@@ -25,19 +28,17 @@ void print_python_bytes(PyObject *p) {
         return;
     }
 
-    printf("[.] bytes object info\n");
-    printf("  Size: %ld\n", PyBytes_Size(p));
-    printf("  Trying string: %s\n", PyBytes_AsString(p));
+    Py_ssize_t size = PyObject_Length(p);
 
-    printf("  first %ld bytes:", PyBytes_Size(p) + 1);
-    if (PyBytes_Size(p) < 10) {
-        for (Py_ssize_t i = 0; i < PyBytes_Size(p) + 1; ++i) {
-            printf(" %02hhx", ((char *)PyBytes_AsString(p))[i]);
-        }
-    } else {
-        for (Py_ssize_t i = 0; i < 10; ++i) {
-            printf(" %02hhx", ((char *)PyBytes_AsString(p))[i]);
-        }
+    printf("[.] bytes object info\n");
+    printf("  Size: %ld\n", size);
+    
+    printf("  Trying string: %s\n", PyUnicode_AsUTF8AndSize(p, NULL));
+
+    printf("  first %ld bytes:", size < 10 ? size : 10);
+    const char *bytes = PyBytes_AsString(p);
+    for (Py_ssize_t i = 0; i < (size < 10 ? size : 10); ++i) {
+        printf(" %02hhx", bytes[i]);
     }
     printf("\n");
 }
