@@ -59,6 +59,7 @@ a TypeError is raised.
     >>> say_my_name(None)
     Traceback (most recent call last):
     TypeError: first_name must be a string
+
 At least one name must be provided.
 
 ::
@@ -66,6 +67,4 @@ At least one name must be provided.
     >>> say_my_name()
     Traceback (most recent call last):
     TypeError: say_my_name() missing 1 required positional argument: 'first_name'
-
-
 
